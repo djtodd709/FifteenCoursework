@@ -32,10 +32,6 @@ void printPuzzle(int* layout, int rowSize) {
 	return;
 }
 
-bool isValidLayout() {
-	return true;
-}
-
 int fac(int f) {
 	if (f == 1) {
 		return 1;
@@ -88,19 +84,17 @@ int consecutivePerms(int* layout, int rowSize) {
 
 int main()
 {
-	int odds = 0;
-	int evens = 0;
 	int start[15] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
 	int start3[8] = { 1,2,3,4,5,6,7,8 };
 	int start5[24] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24 };
-	/*printPuzzle(start,4);
+	printPuzzle(start,4);
 	int consecs = consecutivePerms(start, 4);
 	cout << consecs << endl;
-	int ans = answer(consecs, 4);*/
-	printPuzzle(start5, 5);
+	int ans = answer(consecs, 4);
+	/*printPuzzle(start5, 5);
 	int consecs = consecutivePerms(start5, 5);
 	cout << consecs << endl;
-	unsigned long long ans = answerL(consecs, 5);
+	unsigned long long ans = answerL(consecs, 5);*/
 
 	cout << "row\t\t = " << ans << endl;
 	cout << "column\t\t = " << ans << endl;
