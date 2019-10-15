@@ -1,8 +1,10 @@
 // FifteenCoursework.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+#pragma once
 #include <iostream>
 #include <algorithm>
+#include "Puzzle.h"
 
 using namespace std;
 
@@ -14,22 +16,6 @@ bool evenInversions(int* layout) {
 		}
 	}
 	return (inversions%2 == 0);
-}
-
-void printPuzzle(int* layout, int rowSize) {
-	for (int i = 0; i < rowSize-1; i++) {
-		int rowIndex = i * rowSize;
-		for (int j = 0; j < rowSize; j++) {
-			cout << layout[rowIndex + j] << "\t";
-		}
-		cout << endl;
-	}
-	int rowIndex = (rowSize-1) * rowSize;
-	for (int j = 0; j < rowSize-1; j++) {
-		cout << layout[rowIndex + j] << "\t";
-	}
-	cout << endl;
-	return;
 }
 
 int fac(int f) {
@@ -81,25 +67,54 @@ int consecutivePerms(int* layout, int rowSize) {
 	return consecutives;
 }
 
+void fillPuzzle(Puzzle*& p) {
+	int x;
+	cout << "Please enter a number for the next tile: ";
+	cin >> x;
+	while (p->isTilePresent(x)) {
+		cout << x << " is already present in the square: ";
+		cin >> x;
+	}
+	p->setNextTile(x);
+	system("CLS");
+	p->printPuzzle();
+}
 
 int main()
 {
+	Puzzle* p = new Puzzle(4);
+
+	p->printPuzzle();
+
+	while (!p->isFull()) {
+		fillPuzzle(p);
+	}
+
+	p->printPuzzle();
+
+	delete p;
+	p = NULL;
+
 	int start[15] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
-	int start3[8] = { 1,2,3,4,5,6,7,8 };
+
+	
+
+	/*int start3[8] = { 1,2,3,4,5,6,7,8 };
 	int start5[24] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24 };
 	printPuzzle(start,4);
 	int consecs = consecutivePerms(start, 4);
 	cout << consecs << endl;
 	int ans = answer(consecs, 4);
-	/*printPuzzle(start5, 5);
+	
+	printPuzzle(start5, 5);
 	int consecs = consecutivePerms(start5, 5);
 	cout << consecs << endl;
-	unsigned long long ans = answerL(consecs, 5);*/
+	unsigned long long ans = answerL(consecs, 5);
 
 	cout << "row\t\t = " << ans << endl;
 	cout << "column\t\t = " << ans << endl;
 	cout << "reverse row\t = " << ans << endl;
-	cout << "reverse column\t = " << ans << endl;
+	cout << "reverse column\t = " << ans << endl;*/
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
