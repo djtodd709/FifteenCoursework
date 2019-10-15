@@ -1,14 +1,18 @@
 #include <iostream>
+#include <stdlib.h>
 #include "Puzzle.h"
 
 using namespace std;
 
 Puzzle::Puzzle(int rows) :
-rowSize(rows),setTiles(0){
+rowSize(rows),setTiles(0),numLimit(20){
 	numTiles = (rows * rows) - 1;
 	layout = new int[numTiles];
+	if (numTiles > 20)
+		numLimit = numTiles;
 }
 
+//WILL NOT BE NEEDED IN FINAL
 Puzzle::Puzzle(int* setup, int rows) :
 Puzzle(rows) {
 	for (int i = 0; i < numTiles; i++) {
@@ -19,6 +23,17 @@ Puzzle(rows) {
 
 Puzzle::~Puzzle() {
 	delete[] layout;
+}
+
+RandomPuzzle::RandomPuzzle(int rows):
+Puzzle(rows){
+	for (int i = 0; i < numTiles; i++) {
+		int x = rand() % numLimit + 1;
+		while (isTilePresent(x)) {
+			x = rand() % numLimit + 1;
+		}
+		setNextTile(x);
+	}
 }
 
 bool Puzzle::isTilePresent(int value) const{
