@@ -10,6 +10,7 @@ public:
 	void setNextTile(int value);
 	void printPuzzle() const;
 	bool isFull() const;
+	int getNumLimit() const;
 	int getConsCombs() const;
 protected:
 	int* layout;

@@ -68,31 +68,43 @@ int consecutivePerms(int* layout, int rowSize) {
 	return consecutives;
 }
 
+void getInputNum(int& x, int min, int max) {
+	bool passed = false;
+	while (!passed) {
+		cin >> x;
+		if (!cin) {
+			cin.clear();
+			cin.ignore(INT_MAX, '\n');
+			cout << "That's not a valid number: ";
+			continue;
+		}
+		if ((x > max) | (x < min)) {
+			cout << x << " is not within the allowed number range: ";
+			continue;
+		}
+		passed = true;
+	}
+}
+
 void fillPuzzle(Puzzle*& p) {
 	int x;
 	cout << "Please enter a number for the next tile: ";
-	cin >> x;
+	getInputNum(x, 1, p->getNumLimit());
 	while (p->isTilePresent(x)) {
 		cout << x << " is already present in the square: ";
-		cin >> x;
+		getInputNum(x, 1, p->getNumLimit());
 	}
 	p->setNextTile(x);
 	system("CLS");
+	cout << "Manually Create Configuration" << endl;
 	p->printPuzzle();
 }
 
-int main()
-{
-	srand(time(NULL));
+void makeManualPuzzle() {
+	system("CLS");
+	cout << "Manually Create Configuration" << endl;
 
-	Puzzle* p = new RandomPuzzle(4);
-
-	p->printPuzzle();
-
-	delete p;
-	p = NULL;
-
-	p = new Puzzle(4);
+	Puzzle* p = new Puzzle(4);
 
 	p->printPuzzle();
 
@@ -105,7 +117,63 @@ int main()
 	delete p;
 	p = NULL;
 
-	int start[15] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
+}
+
+void makeRandomPuzzle() {
+	system("CLS");
+	cout << "Generate Random Configurations" << endl;
+	cout << "How many configurations would you like to generate?: ";
+	int numPuzzles;
+	getInputNum(numPuzzles, 1, INT_MAX);
+	for (int i = 0; i < numPuzzles; i++) {
+		Puzzle* p = new RandomPuzzle(4);
+
+		p->printPuzzle();
+		cout << endl;
+
+		delete p;
+		p = NULL;
+	}
+}
+
+int main()
+{
+	srand(time(NULL));
+
+	bool exit = false;
+
+	while (true) {
+		cout << "(1)\tManually create configuration" << endl;
+		cout << "(2)\tGenerate random configurations" << endl;
+		cout << "(3)\tRead in configurations from a file" << endl;
+		cout << "(4)\tExit program" << endl;
+		cout << "Please choose a mode of operation: ";
+		int x;
+		getInputNum(x, 1, 4);
+
+		switch (x) {
+		case 1:
+			makeManualPuzzle();
+			break;
+		case 2: 
+			makeRandomPuzzle();
+			break;
+		case 3:
+			break;
+		case 4:
+			exit = true;
+			break;
+		}
+		
+		if (exit)
+			break;
+	}
+
+	
+
+	
+
+	//int start[15] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
 
 	
 

@@ -44,6 +44,10 @@ bool Puzzle::isTilePresent(int value) const{
 	return present;
 }
 
+int Puzzle::getNumLimit() const {
+	return numLimit;
+}
+
 void Puzzle::setNextTile(int value) {
 	if (setTiles < numTiles) {
 		layout[setTiles] = value;
