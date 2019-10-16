@@ -59,26 +59,25 @@ bool Puzzle::isFull() const{
 	return setTiles == numTiles;
 }
 
-void Puzzle::printPuzzle() const{
+void Puzzle::stream_to(std::ostream& ostr) const {
 	int col = 0;
 	for (int i = 0; i < setTiles; i++) {
-		cout << layout[i] << "\t";
+		ostr << layout[i] << "\t";
 		col++;
 		if (col == rowSize) {
 			col = 0;
-			cout << endl;
+			ostr << endl;
 		}
 	}
 
 	for (int i = setTiles; i < numTiles; i++) {
-		cout << "__\t";
+		ostr << "__\t";
 		col++;
 		if (col == rowSize) {
 			col = 0;
-			cout << endl;
+			ostr << endl;
 		}
 	}
 
-	cout << endl;
-	return;
+	ostr << endl;
 }

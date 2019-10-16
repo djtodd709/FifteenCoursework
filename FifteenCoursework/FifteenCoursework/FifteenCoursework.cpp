@@ -9,16 +9,6 @@
 
 using namespace std;
 
-bool evenInversions(int* layout) {
-	int inversions = 0;
-	for (int i = 0; i < 8; i++) {
-		for (int j = i + 1; j < 8; j++) {
-			inversions += layout[i] > layout[j];
-		}
-	}
-	return (inversions%2 == 0);
-}
-
 int fac(int f) {
 	if (f == 1) {
 		return 1;
@@ -68,6 +58,9 @@ int consecutivePerms(int* layout, int rowSize) {
 	return consecutives;
 }
 
+
+/// ^^^^ TO BE MOVED
+
 void getInputNum(int& x, int min, int max) {
 	bool passed = false;
 	while (!passed) {
@@ -97,7 +90,7 @@ void fillPuzzle(Puzzle*& p) {
 	p->setNextTile(x);
 	system("CLS");
 	cout << "Manually Create Configuration" << endl;
-	p->printPuzzle();
+	cout << *p;
 }
 
 void makeManualPuzzle() {
@@ -106,13 +99,18 @@ void makeManualPuzzle() {
 
 	Puzzle* p = new Puzzle(4);
 
-	p->printPuzzle();
+	cout << *p;
 
 	while (!p->isFull()) {
 		fillPuzzle(p);
 	}
 
-	p->printPuzzle();
+	cout << endl << "(1) Overite 15-File" << endl;
+	cout << "(2) Append to 15-File" << endl;
+	cout << "(3) Do not add to 15-File" << endl;
+	cout << "What would you like to do with this configuration?: ";
+	int choice;
+	getInputNum(choice, 1, 3);
 
 	delete p;
 	p = NULL;
@@ -122,18 +120,25 @@ void makeManualPuzzle() {
 void makeRandomPuzzle() {
 	system("CLS");
 	cout << "Generate Random Configurations" << endl;
-	cout << "How many configurations would you like to generate?: ";
+	cout << "How many configurations would you like to generate?: " << endl;
 	int numPuzzles;
 	getInputNum(numPuzzles, 1, INT_MAX);
 	for (int i = 0; i < numPuzzles; i++) {
 		Puzzle* p = new RandomPuzzle(4);
 
-		p->printPuzzle();
+		cout << *p;
 		cout << endl;
 
-		delete p;
+		delete p; ///<------------HMM
 		p = NULL;
 	}
+
+	cout << endl << "(1) Overite 15-File" << endl;
+	cout << "(2) Append to 15-File" << endl;
+	cout << "(3) Do not add to 15-File" << endl;
+	cout << "What would you like to do with this configuration set?: ";
+	int choice;
+	getInputNum(choice, 1, 3);
 }
 
 int main()
@@ -147,7 +152,7 @@ int main()
 		cout << "(2)\tGenerate random configurations" << endl;
 		cout << "(3)\tRead in configurations from a file" << endl;
 		cout << "(4)\tExit program" << endl;
-		cout << "Please choose a mode of operation: ";
+		cout << "What would you like to do?: ";
 		int x;
 		getInputNum(x, 1, 4);
 

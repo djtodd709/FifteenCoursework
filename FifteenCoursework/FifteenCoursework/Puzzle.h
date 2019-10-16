@@ -1,4 +1,8 @@
 #pragma once
+
+#include <iostream>
+using namespace std;
+
 class Puzzle
 {
 public:
@@ -8,7 +12,7 @@ public:
 	~Puzzle();
 	bool isTilePresent(int value) const;
 	void setNextTile(int value);
-	void printPuzzle() const;
+	void stream_to(ostream& ostr) const;
 	bool isFull() const;
 	int getNumLimit() const;
 	int getConsCombs() const;
@@ -24,3 +28,8 @@ class RandomPuzzle : public Puzzle {
 public:
 	RandomPuzzle(int rows = defaultSize);
 };
+
+inline ostream& operator<<(ostream& ostr, const Puzzle& p) {
+	p.stream_to(ostr);
+	return ostr;
+}
