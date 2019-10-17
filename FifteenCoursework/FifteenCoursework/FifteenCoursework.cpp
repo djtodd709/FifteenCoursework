@@ -3,6 +3,8 @@
 
 #pragma once
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <algorithm>
 #include <time.h>
 #include "Puzzle.h"
@@ -65,21 +67,37 @@ void getInputNum(int& x, int min, int max) {
 	bool passed = false;
 	while (!passed) {
 		cin >> x;
+		
 		if (!cin) {
 			cin.clear();
 			cin.ignore(INT_MAX, '\n');
 			cout << "That's not a valid number: ";
 			continue;
 		}
+
+		if (!(cin.peek() == '\n')) {
+			cin.clear();
+			cin.ignore(INT_MAX, '\n');
+			cout << "That's not a valid number: ";
+			continue;
+		}
+
 		if ((x > max) | (x < min)) {
+			cin.clear();
+			cin.ignore(INT_MAX, '\n');
 			cout << x << " is not within the allowed number range: ";
 			continue;
 		}
+		
 		passed = true;
 	}
 }
 
 void fillPuzzle(Puzzle*& p) {
+	system("CLS");
+	cout << "Manually Create Configuration" << endl;
+	cout << *p;
+
 	int x;
 	cout << "Please enter a number for the next tile: ";
 	getInputNum(x, 1, p->getNumLimit());
@@ -88,29 +106,131 @@ void fillPuzzle(Puzzle*& p) {
 		getInputNum(x, 1, p->getNumLimit());
 	}
 	p->setNextTile(x);
-	system("CLS");
-	cout << "Manually Create Configuration" << endl;
-	cout << *p;
+}
+
+void overwriteFile(Puzzle** puzzleList, int numPuzzles) {
+	ofstream outfile("15-File.txt");
+	if (!outfile) {
+		cout << "Could not open the 15-file." << endl;
+		return;
+	}
+
+	outfile << numPuzzles << endl;
+
+	for (int i = 0; i < numPuzzles; i++) {
+		outfile << *(puzzleList[i]) << endl;
+	}
+
+	outfile.close();
+}
+
+Puzzle** openFile(int& numPuzzles, int rowSize) {
+	string line;
+	ifstream infile("15-File.txt");
+	if (!infile) {
+		cout << "Could not open the 15-file. Make sure a 15-file already exists." << endl;
+		return NULL;
+	}
+	
+	infile >> line;
+	numPuzzles = stoi(line);
+
+	Puzzle** puzzleList = new Puzzle*[numPuzzles];
+
+	int squareSize = rowSize * rowSize - 1;
+	int i = 0;
+	int listIndex = 0;
+	int* square = new int[squareSize];
+	while (infile >> line) {
+		square[i] = stoi(line);
+		i++;
+		if (i == squareSize) {
+			i = 0;
+			Puzzle* p = new Puzzle(square, rowSize);
+			puzzleList[listIndex] = p;
+			listIndex++;
+		}
+	}
+
+	if (listIndex != numPuzzles) {
+		infile.close();
+		cout << "Unexpected number of puzzles. 15-file is corrupt. Try creating a new 15-file." << endl;
+		return NULL;
+	}
+
+	infile.close();
+	return puzzleList;
+}
+
+void appendFile(Puzzle** puzzleList, int numPuzzles) {
+	int oldNumPuzzles;
+	Puzzle** oldPuzzleList = openFile(oldNumPuzzles, 4);
+
+	ofstream outfile("15-File.txt");
+	if (!outfile) {
+		cout << "Could not open the 15-file." << endl;
+		return;
+	}
+
+	int newNumPuzzles = numPuzzles + oldNumPuzzles;
+
+	outfile << newNumPuzzles << endl;
+
+	for (int i = 0; i < oldNumPuzzles; i++) {
+		Puzzle* p = oldPuzzleList[i];
+		outfile << *p << endl;
+		delete p;
+		p = NULL;
+	}
+
+	delete[] oldPuzzleList;
+	oldPuzzleList = NULL;
+
+	for (int i = 0; i < numPuzzles; i++) {
+		outfile << *(puzzleList[i]) << endl;
+	}
+
+	outfile.close();
+
+}
+
+void fileChoice(Puzzle** puzzleList, int numPuzzles) {
+	int choice;
+	getInputNum(choice, 1, 3);
+	switch (choice) {
+	case 1:
+		overwriteFile(puzzleList, numPuzzles);
+		system("CLS");
+		cout << "15-File successfully overwritten" << endl << endl;
+		break;
+	case 2:
+		appendFile(puzzleList, numPuzzles);
+		system("CLS");
+		cout << "15-File successfully appended" << endl << endl;
+		break;
+	case 3:
+		system("CLS");
+		cout << "Nothing has been added to the 15-File" << endl << endl;
+		break;
+	}
 }
 
 void makeManualPuzzle() {
-	system("CLS");
-	cout << "Manually Create Configuration" << endl;
-
 	Puzzle* p = new Puzzle(4);
-
-	cout << *p;
 
 	while (!p->isFull()) {
 		fillPuzzle(p);
 	}
 
+	system("CLS");
+	cout << "Manually Create Configuration" << endl;
+	cout << *p;
+
 	cout << endl << "(1) Overite 15-File" << endl;
 	cout << "(2) Append to 15-File" << endl;
 	cout << "(3) Do not add to 15-File" << endl;
 	cout << "What would you like to do with this configuration?: ";
-	int choice;
-	getInputNum(choice, 1, 3);
+	fileChoice(&p,1);
 
 	delete p;
 	p = NULL;
@@ -123,22 +243,47 @@ void makeRandomPuzzle() {
 	cout << "How many configurations would you like to generate?: " << endl;
 	int numPuzzles;
 	getInputNum(numPuzzles, 1, INT_MAX);
+	Puzzle** randPuzzles = new Puzzle*[numPuzzles];
 	for (int i = 0; i < numPuzzles; i++) {
 		Puzzle* p = new RandomPuzzle(4);
 
 		cout << *p;
 		cout << endl;
 
-		delete p; ///<------------HMM
-		p = NULL;
+		randPuzzles[i] = p;
 	}
 
 	cout << endl << "(1) Overite 15-File" << endl;
 	cout << "(2) Append to 15-File" << endl;
 	cout << "(3) Do not add to 15-File" << endl;
 	cout << "What would you like to do with this configuration set?: ";
-	int choice;
-	getInputNum(choice, 1, 3);
+	fileChoice(randPuzzles,numPuzzles);
+
+	for (int i = 0; i < numPuzzles; i++) {
+		delete randPuzzles[i];
+		randPuzzles[i] = NULL;
+	}
+	delete [] randPuzzles;
+	randPuzzles = NULL;
+}
+
+void readPuzzles() {
+	system("CLS");
+	cout << "Your current 15-File:" << endl;
+	int numPuzzles;
+	Puzzle** pList = openFile(numPuzzles, 4);
+
+	cout << numPuzzles << endl;
+
+	for (int i = 0; i < numPuzzles; i++) {
+		Puzzle* p = pList[i];
+		cout << *p << endl;
+		delete p;
+		p = NULL;
+	}
+
+	delete[] pList;
+	pList = NULL;
 }
 
 int main()
@@ -164,6 +309,7 @@ int main()
 			makeRandomPuzzle();
 			break;
 		case 3:
+			readPuzzles();
 			break;
 		case 4:
 			exit = true;

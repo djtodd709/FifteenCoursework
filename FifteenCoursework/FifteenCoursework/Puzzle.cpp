@@ -12,7 +12,6 @@ rowSize(rows),setTiles(0),numLimit(20){
 		numLimit = numTiles;
 }
 
-//WILL NOT BE NEEDED IN FINAL
 Puzzle::Puzzle(int* setup, int rows) :
 Puzzle(rows) {
 	for (int i = 0; i < numTiles; i++) {
