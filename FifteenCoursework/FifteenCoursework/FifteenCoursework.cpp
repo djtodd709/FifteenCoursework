@@ -11,58 +11,6 @@
 
 using namespace std;
 
-int fac(int f) {
-	if (f == 1) {
-		return 1;
-	}
-	return f * fac(f - 1);
-}
-
-unsigned long long fac(unsigned long long f) {
-	if (f == 1) {
-		return 1;
-	}
-	return f * fac(f - 1);
-}
-
-int answer(int consecutives, int rowSize) {
-	return (rowSize - 1) * consecutives * fac((rowSize * (rowSize - 1)) - 1) / 2;
-}
-
-unsigned long long answerL(int consecutives, int rowSize) {
-	return (rowSize - 1) * consecutives * fac((unsigned long long)(rowSize * (rowSize - 1)) - 1) / 2;
-}
-
-int compare(const void* a, const void* b)
-{
-	return (*(int*)a - *(int*)b);
-}
-
-int consecutivePerms(int* layout, int rowSize) {
-	int squareSize = rowSize * rowSize - 1;
-	int* layoutCopy = new int[squareSize];
-	copy(layout,layout+squareSize,layoutCopy);
-	qsort(layoutCopy, squareSize, sizeof(int), compare);
-	int consecutives = 0;
-	int conStreak = 0;
-	for (int i = 1; i < squareSize; i++) {
-		if (layoutCopy[i] - 1 == layoutCopy[i-1]) {
-			conStreak++;
-			if (conStreak >= rowSize-1) {
-				consecutives++;
-			}
-		}
-		else {
-			conStreak = 0;
-		}
-	}
-	delete[] layoutCopy;
-	return consecutives;
-}
-
-
-/// ^^^^ TO BE MOVED
-
 void getInputNum(int& x, int min, int max) {
 	bool passed = false;
 	while (!passed) {
@@ -277,7 +225,12 @@ void readPuzzles() {
 
 	for (int i = 0; i < numPuzzles; i++) {
 		Puzzle* p = pList[i];
-		cout << *p << endl;
+		cout << *p;
+		int continuousAns = p->getAnswer(true);
+		cout << "row = " << continuousAns << endl;
+		cout << "column = " << continuousAns << endl;
+		cout << "reverse row = " << continuousAns << endl;
+		cout << "reverse column = " << continuousAns << endl << endl;
 		delete p;
 		p = NULL;
 	}
@@ -295,7 +248,7 @@ int main()
 	while (true) {
 		cout << "(1)\tManually create configuration" << endl;
 		cout << "(2)\tGenerate random configurations" << endl;
-		cout << "(3)\tRead in configurations from a file" << endl;
+		cout << "(3)\tCalculate continuous rows/columns from a 15-file" << endl;
 		cout << "(4)\tExit program" << endl;
 		cout << "What would you like to do?: ";
 		int x;

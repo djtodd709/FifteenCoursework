@@ -15,7 +15,8 @@ public:
 	void stream_to(ostream& ostr) const;
 	bool isFull() const;
 	int getNumLimit() const;
-	int getConsCombs() const;
+	int getConsCombs(int consecLength) const;
+	int getAnswer(bool includeLastRow) const;
 protected:
 	int* layout;
 	int rowSize;

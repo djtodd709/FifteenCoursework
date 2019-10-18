@@ -80,3 +80,44 @@ void Puzzle::stream_to(std::ostream& ostr) const {
 
 	ostr << endl;
 }
+
+int compare(const void* a, const void* b)
+{
+	return (*(int*)a - *(int*)b);
+}
+
+int Puzzle::getConsCombs(int consecLength) const{
+	int* layoutCopy = new int[numTiles];
+	copy(layout, layout + numTiles, layoutCopy);
+	qsort(layoutCopy, numTiles, sizeof(int), compare);
+	int consecutives = 0;
+	int conStreak = 0;
+	for (int i = 1; i < numTiles; i++) {
+		if (layoutCopy[i] - 1 == layoutCopy[i - 1]) {
+			conStreak++;
+			if (conStreak >= consecLength - 1) {
+				consecutives++;
+			}
+		}
+		else {
+			conStreak = 0;
+		}
+	}
+	delete[] layoutCopy;
+	return consecutives;
+}
+
+int fac(int f) {
+	if (f == 1) {
+		return 1;
+	}
+	return f * fac(f - 1);
+}
+
+int Puzzle::getAnswer(bool includeLastRow) const{
+	int answer = (rowSize - 1) * getConsCombs(rowSize) * fac(numTiles-rowSize) / 2;
+	if (includeLastRow) {
+		answer += getConsCombs(rowSize-1) * fac(numTiles + 1 - rowSize) / 2;
+	}
+	return answer;
+}
