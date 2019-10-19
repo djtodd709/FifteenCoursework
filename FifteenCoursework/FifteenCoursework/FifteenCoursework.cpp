@@ -56,22 +56,6 @@ void fillPuzzle(Puzzle*& p) {
 	p->setNextTile(x);
 }
 
-void overwriteFile(Puzzle** puzzleList, int numPuzzles) {
-	ofstream outfile("15-File.txt");
-	if (!outfile) {
-		cout << "Could not open the 15-file." << endl;
-		return;
-	}
-
-	outfile << numPuzzles << endl;
-
-	for (int i = 0; i < numPuzzles; i++) {
-		outfile << *(puzzleList[i]) << endl;
-	}
-
-	outfile.close();
-}
-
 Puzzle** openFile(int& numPuzzles, int rowSize) {
 	string line;
 	ifstream infile("15-File.txt");
@@ -79,11 +63,11 @@ Puzzle** openFile(int& numPuzzles, int rowSize) {
 		cout << "Could not open the 15-file. Make sure a 15-file already exists." << endl;
 		return NULL;
 	}
-	
+
 	infile >> line;
 	numPuzzles = stoi(line);
 
-	Puzzle** puzzleList = new Puzzle*[numPuzzles];
+	Puzzle** puzzleList = new Puzzle * [numPuzzles];
 
 	int squareSize = rowSize * rowSize - 1;
 	int i = 0;
@@ -108,6 +92,52 @@ Puzzle** openFile(int& numPuzzles, int rowSize) {
 
 	infile.close();
 	return puzzleList;
+}
+
+void saveSolution() {
+	ofstream outfile("Solution-File.txt");
+	if (!outfile) {
+		cout << "Could not open the solution-file." << endl;
+		return;
+	}
+
+	int numPuzzles;
+	Puzzle** pList = openFile(numPuzzles, 4);
+
+	outfile << numPuzzles << endl;
+
+	for (int i = 0; i < numPuzzles; i++) {
+		Puzzle* p = pList[i];
+		outfile << *p;
+		int continuousAns = p->getAnswer(true);
+		outfile << "row = " << continuousAns << endl;
+		outfile << "column = " << continuousAns << endl;
+		outfile << "reverse row = " << continuousAns << endl;
+		outfile << "reverse column = " << continuousAns << endl << endl;
+		delete p;
+		p = NULL;
+	}
+
+	delete[] pList;
+	pList = NULL;
+
+	outfile.close();
+}
+
+void overwriteFile(Puzzle** puzzleList, int numPuzzles) {
+	ofstream outfile("15-File.txt");
+	if (!outfile) {
+		cout << "Could not open the 15-file." << endl;
+		return;
+	}
+
+	outfile << numPuzzles << endl;
+
+	for (int i = 0; i < numPuzzles; i++) {
+		outfile << *(puzzleList[i]) << endl;
+	}
+
+	outfile.close();
 }
 
 void appendFile(Puzzle** puzzleList, int numPuzzles) {
@@ -217,6 +247,25 @@ void makeRandomPuzzle() {
 
 void readPuzzles() {
 	system("CLS");
+
+	bool freeSquare = true;
+
+	cout << "(1)\tInclude rows/columns with the free square" << endl;
+	cout << "(2)\tIgnore rows/columns with the free square" << endl;
+	cout << "What would you like to do?: ";
+	int x;
+	getInputNum(x, 1, 2);
+
+	switch (x) {
+	case 1:
+		freeSquare = true;
+		break;
+	case 2:
+		freeSquare = false;
+		break;
+	}
+
+
 	cout << "Your current 15-File:" << endl;
 	int numPuzzles;
 	Puzzle** pList = openFile(numPuzzles, 4);
@@ -226,7 +275,7 @@ void readPuzzles() {
 	for (int i = 0; i < numPuzzles; i++) {
 		Puzzle* p = pList[i];
 		cout << *p;
-		int continuousAns = p->getAnswer(true);
+		int continuousAns = p->getAnswer(freeSquare);
 		cout << "row = " << continuousAns << endl;
 		cout << "column = " << continuousAns << endl;
 		cout << "reverse row = " << continuousAns << endl;
@@ -237,6 +286,23 @@ void readPuzzles() {
 
 	delete[] pList;
 	pList = NULL;
+
+	cout << "(1)\tSave these calculations in the solution file" << endl;
+	cout << "(2)\tIgnore these calculations and return to the main menu" << endl;
+	cout << "What would you like to do?: ";
+	int y;
+	getInputNum(y, 1, 2);
+
+	switch (y) {
+	case 1:
+		saveSolution();
+		system("CLS");
+		cout << "Solution file saved succesfully" << endl;
+		break;
+	case 2:
+		system("CLS");
+		break;
+	}
 }
 
 int main()
