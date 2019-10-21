@@ -94,7 +94,38 @@ Puzzle** openFile(int& numPuzzles, int rowSize) {
 	return puzzleList;
 }
 
-void saveSolution() {
+void outputAnalysis(ostream& dest, Puzzle** pList, int numPuzzles, int partialSize, bool freeSquare) {
+	dest << numPuzzles << endl;
+
+	for (int i = 0; i < numPuzzles; i++) {
+		Puzzle* p = pList[i];
+		dest << *p;
+
+		int prefix;
+		int suffix;
+		p->getAnswerFacForm(prefix, suffix, partialSize, freeSquare);
+
+		if (prefix % 2 == 1) {
+			dest << "row = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
+			dest << "column = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
+			dest << "reverse row = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
+			dest << "reverse column = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
+		}
+		else {
+			dest << "row = " << prefix / 2 << " x " << suffix << "!" << endl;
+			dest << "column = " << prefix / 2 << " x " << suffix << "!" << endl;
+			dest << "reverse row = " << prefix / 2 << " x " << suffix << "!" << endl;
+			dest << "reverse column = " << prefix / 2 << " x " << suffix << "!" << endl;
+		}
+
+		dest << endl;
+
+		delete p;
+		p = NULL;
+	}
+}
+
+void saveSolution(int partialSize, bool freeSquare) {
 	ofstream outfile("Solution-File.txt");
 	if (!outfile) {
 		cout << "Could not open the solution-file." << endl;
@@ -104,19 +135,7 @@ void saveSolution() {
 	int numPuzzles;
 	Puzzle** pList = openFile(numPuzzles, 4);
 
-	outfile << numPuzzles << endl;
-
-	for (int i = 0; i < numPuzzles; i++) {
-		Puzzle* p = pList[i];
-		outfile << *p;
-		unsigned long long continuousAns = p->getAnswer(true);
-		outfile << "row = " << continuousAns << endl;
-		outfile << "column = " << continuousAns << endl;
-		outfile << "reverse row = " << continuousAns << endl;
-		outfile << "reverse column = " << continuousAns << endl << endl;
-		delete p;
-		p = NULL;
-	}
+	outputAnalysis(outfile, pList, numPuzzles, partialSize, freeSquare);
 
 	delete[] pList;
 	pList = NULL;
@@ -288,34 +307,7 @@ void readPuzzles() {
 
 	cout << "Your current 15-File:" << endl;
 
-	cout << numPuzzles << endl;
-
-	for (int i = 0; i < numPuzzles; i++) {
-		Puzzle* p = pList[i];
-		cout << *p;
-
-		int prefix;
-		int suffix;
-		p->getAnswerFacForm(prefix, suffix, partialSize, freeSquare);
-
-		if (prefix % 2 == 1) {
-			cout << "row = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
-			cout << "column = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
-			cout << "reverse row = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
-			cout << "reverse column = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
-		}
-		else {
-			cout << "row = " << prefix / 2 << " x " << suffix << "!" << endl;
-			cout << "column = " << prefix / 2 << " x " << suffix << "!" << endl;
-			cout << "reverse row = " << prefix / 2 << " x " << suffix << "!" << endl;
-			cout << "reverse column = " << prefix / 2 << " x " << suffix << "!" << endl;
-		}
-
-		cout << endl;
-
-		delete p;
-		p = NULL;
-	}
+	outputAnalysis(cout, pList, numPuzzles, partialSize, freeSquare);
 
 	delete[] pList;
 	pList = NULL;
@@ -328,7 +320,7 @@ void readPuzzles() {
 
 	switch (y) {
 	case 1:
-		saveSolution();
+		saveSolution(partialSize,freeSquare);
 		system("CLS");
 		cout << "Solution file saved succesfully" << endl;
 		break;
