@@ -109,7 +109,7 @@ void saveSolution() {
 	for (int i = 0; i < numPuzzles; i++) {
 		Puzzle* p = pList[i];
 		outfile << *p;
-		int continuousAns = p->getAnswer(true);
+		unsigned long long continuousAns = p->getAnswer(true);
 		outfile << "row = " << continuousAns << endl;
 		outfile << "column = " << continuousAns << endl;
 		outfile << "reverse row = " << continuousAns << endl;
@@ -143,6 +143,12 @@ void overwriteFile(Puzzle** puzzleList, int numPuzzles) {
 void appendFile(Puzzle** puzzleList, int numPuzzles) {
 	int oldNumPuzzles;
 	Puzzle** oldPuzzleList = openFile(oldNumPuzzles, 4);
+
+	if (oldPuzzleList == NULL) {
+		cout << "Could not find the 15-file. Creating new 15-File..." << endl;
+		overwriteFile(puzzleList, numPuzzles);
+		return;
+	}
 
 	ofstream outfile("15-File.txt");
 	if (!outfile) {
@@ -248,6 +254,15 @@ void makeRandomPuzzle() {
 void readPuzzles() {
 	system("CLS");
 
+	int numPuzzles;
+	Puzzle** pList = openFile(numPuzzles, 4);
+
+	if (pList == NULL) {
+		cout << "You do not currently have a 15-File." << endl;
+		cout << "Please create one using the other menu options first." << endl << endl;
+		return;
+	}
+
 	bool freeSquare = true;
 
 	cout << "(1)\tInclude rows/columns with the free square" << endl;
@@ -265,17 +280,14 @@ void readPuzzles() {
 		break;
 	}
 
-
 	cout << "Your current 15-File:" << endl;
-	int numPuzzles;
-	Puzzle** pList = openFile(numPuzzles, 4);
 
 	cout << numPuzzles << endl;
 
 	for (int i = 0; i < numPuzzles; i++) {
 		Puzzle* p = pList[i];
 		cout << *p;
-		int continuousAns = p->getAnswer(freeSquare);
+		unsigned long long continuousAns = p->getAnswer(freeSquare);
 		cout << "row = " << continuousAns << endl;
 		cout << "column = " << continuousAns << endl;
 		cout << "reverse row = " << continuousAns << endl;
@@ -367,14 +379,3 @@ int main()
 	cout << "reverse row\t = " << ans << endl;
 	cout << "reverse column\t = " << ans << endl;*/
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

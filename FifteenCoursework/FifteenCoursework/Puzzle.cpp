@@ -107,15 +107,15 @@ int Puzzle::getConsCombs(int consecLength) const{
 	return consecutives;
 }
 
-int fac(int f) {
+unsigned long long fac(int f) {
 	if (f == 1) {
 		return 1;
 	}
 	return f * fac(f - 1);
 }
 
-int Puzzle::getAnswer(bool includeLastRow) const{
-	int answer = (rowSize - 1) * getConsCombs(rowSize) * fac(numTiles-rowSize) / 2;
+unsigned long long Puzzle::getAnswer(bool includeLastRow) const{
+	unsigned long long answer = ((unsigned long long)rowSize - 1) * getConsCombs(rowSize) * fac(numTiles-rowSize) / 2;
 	if (includeLastRow) {
 		answer += getConsCombs(rowSize-1) * fac(numTiles + 1 - rowSize) / 2;
 	}

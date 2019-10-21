@@ -16,7 +16,7 @@ public:
 	bool isFull() const;
 	int getNumLimit() const;
 	int getConsCombs(int consecLength) const;
-	int getAnswer(bool includeLastRow) const;
+	unsigned long long getAnswer(bool includeLastRow) const;
 protected:
 	int* layout;
 	int rowSize;
