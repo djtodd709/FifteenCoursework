@@ -94,7 +94,23 @@ Puzzle** openFile(int& numPuzzles, int rowSize) {
 	return puzzleList;
 }
 
-void saveSolution() {
+void outputAnalysis(ostream& dest, Puzzle** pList, int numPuzzles, bool freeSquare) {
+	dest << numPuzzles << endl;
+
+	for (int i = 0; i < numPuzzles; i++) {
+		Puzzle* p = pList[i];
+		dest << *p;
+		unsigned long long continuousAns = p->getAnswer(freeSquare);
+		dest << "row = " << continuousAns << endl;
+		dest << "column = " << continuousAns << endl;
+		dest << "reverse row = " << continuousAns << endl;
+		dest << "reverse column = " << continuousAns << endl << endl;
+		delete p;
+		p = NULL;
+	}
+}
+
+void saveSolution(bool freeSquare) {
 	ofstream outfile("Solution-File.txt");
 	if (!outfile) {
 		cout << "Could not open the solution-file." << endl;
@@ -104,19 +120,7 @@ void saveSolution() {
 	int numPuzzles;
 	Puzzle** pList = openFile(numPuzzles, 4);
 
-	outfile << numPuzzles << endl;
-
-	for (int i = 0; i < numPuzzles; i++) {
-		Puzzle* p = pList[i];
-		outfile << *p;
-		unsigned long long continuousAns = p->getAnswer(true);
-		outfile << "row = " << continuousAns << endl;
-		outfile << "column = " << continuousAns << endl;
-		outfile << "reverse row = " << continuousAns << endl;
-		outfile << "reverse column = " << continuousAns << endl << endl;
-		delete p;
-		p = NULL;
-	}
+	outputAnalysis(outfile, pList, numPuzzles, freeSquare);
 
 	delete[] pList;
 	pList = NULL;
@@ -282,19 +286,7 @@ void readPuzzles() {
 
 	cout << "Your current 15-File:" << endl;
 
-	cout << numPuzzles << endl;
-
-	for (int i = 0; i < numPuzzles; i++) {
-		Puzzle* p = pList[i];
-		cout << *p;
-		unsigned long long continuousAns = p->getAnswer(freeSquare);
-		cout << "row = " << continuousAns << endl;
-		cout << "column = " << continuousAns << endl;
-		cout << "reverse row = " << continuousAns << endl;
-		cout << "reverse column = " << continuousAns << endl << endl;
-		delete p;
-		p = NULL;
-	}
+	outputAnalysis(cout, pList, numPuzzles, freeSquare);
 
 	delete[] pList;
 	pList = NULL;
@@ -307,7 +299,7 @@ void readPuzzles() {
 
 	switch (y) {
 	case 1:
-		saveSolution();
+		saveSolution(freeSquare);
 		system("CLS");
 		cout << "Solution file saved succesfully" << endl;
 		break;
