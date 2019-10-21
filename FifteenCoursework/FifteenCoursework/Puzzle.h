@@ -14,9 +14,12 @@ public:
 	void setNextTile(int value);
 	void stream_to(ostream& ostr) const;
 	bool isFull() const;
+	int getRowSize() const;
 	int getNumLimit() const;
 	int getConsCombs(int consecLength) const;
 	unsigned long long getAnswer(bool includeLastRow) const;
+	void getAnswerFacForm(int& prefix, int& factorial, int partSize, bool includeLast) const;
+	int numPossibilities(int partSize) const;
 protected:
 	int* layout;
 	int rowSize;

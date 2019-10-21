@@ -265,19 +265,25 @@ void readPuzzles() {
 
 	bool freeSquare = true;
 
-	cout << "(1)\tInclude rows/columns with the free square" << endl;
-	cout << "(2)\tIgnore rows/columns with the free square" << endl;
-	cout << "What would you like to do?: ";
-	int x;
-	getInputNum(x, 1, 2);
+	cout << "What partial size would you like to use?: ";
+	int partialSize;
+	getInputNum(partialSize, 2, pList[0]->getRowSize());
 
-	switch (x) {
-	case 1:
-		freeSquare = true;
-		break;
-	case 2:
-		freeSquare = false;
-		break;
+	if (partialSize == pList[0]->getRowSize()) {
+		cout << "(1)\tInclude rows/columns with the free square" << endl;
+		cout << "(2)\tIgnore rows/columns with the free square" << endl;
+		cout << "What would you like to do?: ";
+		int x;
+		getInputNum(x, 1, 2);
+
+		switch (x) {
+		case 1:
+			freeSquare = true;
+			break;
+		case 2:
+			freeSquare = false;
+			break;
+		}
 	}
 
 	cout << "Your current 15-File:" << endl;
@@ -287,11 +293,26 @@ void readPuzzles() {
 	for (int i = 0; i < numPuzzles; i++) {
 		Puzzle* p = pList[i];
 		cout << *p;
-		unsigned long long continuousAns = p->getAnswer(freeSquare);
-		cout << "row = " << continuousAns << endl;
-		cout << "column = " << continuousAns << endl;
-		cout << "reverse row = " << continuousAns << endl;
-		cout << "reverse column = " << continuousAns << endl << endl;
+
+		int prefix;
+		int suffix;
+		p->getAnswerFacForm(prefix, suffix, partialSize, freeSquare);
+
+		if (prefix % 2 == 1) {
+			cout << "row = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
+			cout << "column = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
+			cout << "reverse row = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
+			cout << "reverse column = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
+		}
+		else {
+			cout << "row = " << prefix / 2 << " x " << suffix << "!" << endl;
+			cout << "column = " << prefix / 2 << " x " << suffix << "!" << endl;
+			cout << "reverse row = " << prefix / 2 << " x " << suffix << "!" << endl;
+			cout << "reverse column = " << prefix / 2 << " x " << suffix << "!" << endl;
+		}
+
+		cout << endl;
+
 		delete p;
 		p = NULL;
 	}

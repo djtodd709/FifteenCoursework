@@ -43,6 +43,10 @@ bool Puzzle::isTilePresent(int value) const{
 	return present;
 }
 
+int Puzzle::getRowSize() const {
+	return rowSize;
+}
+
 int Puzzle::getNumLimit() const {
 	return numLimit;
 }
@@ -120,4 +124,27 @@ unsigned long long Puzzle::getAnswer(bool includeLastRow) const{
 		answer += getConsCombs(rowSize-1) * fac(numTiles + 1 - rowSize) / 2;
 	}
 	return answer;
+}
+
+int Puzzle::numPossibilities(int partSize) const{
+	if (partSize > rowSize)
+		return 0;
+	int possibilities = rowSize - 1;
+	while (partSize < rowSize) {
+		possibilities += rowSize;
+		partSize++;
+	}
+	return possibilities;
+}
+
+void Puzzle::getAnswerFacForm(int& prefix, int& factorial, int partSize, bool includeLast) const {
+	int spaces = numTiles - partSize;
+
+	prefix = numPossibilities(partSize) * getConsCombs(partSize);
+	factorial = spaces;
+
+	if (includeLast && partSize == rowSize) {
+		int combinations = getConsCombs(partSize-1) * (spaces + 1);
+		prefix += combinations;
+	}
 }
