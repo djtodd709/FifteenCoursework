@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include "Puzzle.h"
+#include <time.h>
 
 using namespace std;
 
@@ -9,7 +10,7 @@ rowSize(rows),setTiles(0),numLimit(20){
 	numTiles = (rows * rows) - 1;
 	layout = new int[numTiles];
 	if (numTiles > 20)
-		numLimit = numTiles;
+		numLimit = numTiles+10;
 }
 
 Puzzle::Puzzle(int* setup, int rows) :
@@ -24,15 +25,26 @@ Puzzle::~Puzzle() {
 	delete[] layout;
 }
 
+random_device r;
+mt19937 gen(r());
+
 RandomPuzzle::RandomPuzzle(int rows):
 Puzzle(rows){
+	uniform_int_distribution<int> distribution(1, numLimit);
+	time_t timer = time(NULL);
+	bool* present = new bool[numLimit] {false};
 	for (int i = 0; i < numTiles; i++) {
-		int x = rand() % numLimit + 1;
-		while (isTilePresent(x)) {
-			x = rand() % numLimit + 1;
+		
+		int x = distribution(gen);
+		while (present[x-1]) {
+			x = distribution(gen);
 		}
 		setNextTile(x);
+		present[x - 1] = true;
 	}
+
+	delete[] present;
+	present = NULL;
 }
 
 bool Puzzle::isTilePresent(int value) const{

@@ -11,6 +11,8 @@
 
 using namespace std;
 
+int PUZZLE_SIZE = 5;
+
 void getInputNum(int& x, int min, int max) {
 	bool passed = false;
 	while (!passed) {
@@ -146,7 +148,7 @@ void saveSolution(int partialSize, bool freeSquare) {
 	}
 
 	int numPuzzles;
-	Puzzle** pList = openFile(numPuzzles, 4);
+	Puzzle** pList = openFile(numPuzzles, PUZZLE_SIZE);
 
 	outputAnalysis(outfile, pList, numPuzzles, partialSize, freeSquare);
 
@@ -174,7 +176,7 @@ void overwriteFile(Puzzle** puzzleList, int numPuzzles) {
 
 void appendFile(Puzzle** puzzleList, int numPuzzles) {
 	int oldNumPuzzles;
-	Puzzle** oldPuzzleList = openFile(oldNumPuzzles, 4);
+	Puzzle** oldPuzzleList = openFile(oldNumPuzzles, PUZZLE_SIZE);
 
 	if (oldPuzzleList == NULL) {
 		cout << "Could not find the 15-file. Creating new 15-File..." << endl;
@@ -232,7 +234,7 @@ void fileChoice(Puzzle** puzzleList, int numPuzzles) {
 }
 
 void makeManualPuzzle() {
-	Puzzle* p = new Puzzle(4);
+	Puzzle* p = new Puzzle(PUZZLE_SIZE);
 
 	while (!p->isFull()) {
 		fillPuzzle(p);
@@ -261,7 +263,7 @@ void makeRandomPuzzle() {
 	getInputNum(numPuzzles, 1, INT_MAX);
 	Puzzle** randPuzzles = new Puzzle*[numPuzzles];
 	for (int i = 0; i < numPuzzles; i++) {
-		Puzzle* p = new RandomPuzzle(4);
+		Puzzle* p = new RandomPuzzle(PUZZLE_SIZE);
 
 		cout << *p;
 		cout << endl;
@@ -287,7 +289,7 @@ void readPuzzles() {
 	system("CLS");
 
 	int numPuzzles;
-	Puzzle** pList = openFile(numPuzzles, 4);
+	Puzzle** pList = openFile(numPuzzles, PUZZLE_SIZE);
 
 	if (pList == NULL) {
 		cout << "You do not currently have a 15-File." << endl;
