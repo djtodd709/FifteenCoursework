@@ -20,6 +20,8 @@ public:
 	unsigned long long getAnswer(bool includeLastRow) const;
 	void getAnswerFacForm(int& prefix, int& factorial, int partSize, bool includeLast) const;
 	int numPossibilities(int partSize) const;
+	int rowConsecs(bool reverse, int partSize) const;
+	int colConsecs(bool reverse, int partSize) const;
 protected:
 	int* layout;
 	int rowSize;

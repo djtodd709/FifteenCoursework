@@ -118,6 +118,19 @@ void outputAnalysis(ostream& dest, Puzzle** pList, int numPuzzles, int partialSi
 			dest << "reverse column = " << prefix / 2 << " x " << suffix << "!" << endl;
 		}
 
+		dest << "(total for row & column, including reverse, in this configuration)" << endl;
+		for (int j = 2; j <= p->getRowSize(); j++) {
+			dest << j << " = " << p->rowConsecs(false, j) + p->colConsecs(false, j) + p->rowConsecs(true, j) + p->colConsecs(true, j) << endl;
+		}
+
+		dest << "(total for row & column, including reverse, for all valid turns)" << endl;
+		for (int j = 2; j <= p->getRowSize(); j++) {
+			p->getAnswerFacForm(prefix, suffix, j, false);
+			dest << j << " = " << prefix * 2 << " x " << suffix << "!" << endl;
+		}
+		p->getAnswerFacForm(prefix, suffix, p->getRowSize(), true);
+		dest << p->getRowSize() << "(free square included) = " << prefix * 2 << " x " << suffix << "!" << endl;
+
 		dest << endl;
 
 		delete p;
@@ -364,31 +377,4 @@ int main()
 			break;
 	}
 
-	
-
-	
-
-	//int start[15] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
-
-	
-
-
-
-
-	/*int start3[8] = { 1,2,3,4,5,6,7,8 };
-	int start5[24] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24 };
-	printPuzzle(start,4);
-	int consecs = consecutivePerms(start, 4);
-	cout << consecs << endl;
-	int ans = answer(consecs, 4);
-	
-	printPuzzle(start5, 5);
-	int consecs = consecutivePerms(start5, 5);
-	cout << consecs << endl;
-	unsigned long long ans = answerL(consecs, 5);
-
-	cout << "row\t\t = " << ans << endl;
-	cout << "column\t\t = " << ans << endl;
-	cout << "reverse row\t = " << ans << endl;
-	cout << "reverse column\t = " << ans << endl;*/
 }

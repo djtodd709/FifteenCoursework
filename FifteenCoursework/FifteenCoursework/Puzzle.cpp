@@ -148,3 +148,58 @@ void Puzzle::getAnswerFacForm(int& prefix, int& factorial, int partSize, bool in
 		prefix += combinations;
 	}
 }
+
+int Puzzle::rowConsecs(bool reverse, int partSize) const {
+	int result = 0;
+	int conStreak = 0;
+
+	int searchFor = 1;
+	if (reverse)
+		searchFor = -1;
+
+	for (int i = 0; i < numTiles - 1; i++) {
+		if ((i + 1) % rowSize == 0) {
+			conStreak = 0;
+			continue;
+		}
+		if (layout[i + 1] - layout[i] == searchFor) {
+			conStreak++;
+			if (conStreak >= partSize - 1) {
+				result++;
+			}
+		}
+		else {
+			conStreak = 0;
+		}
+	}
+
+	return result;
+}
+
+int Puzzle::colConsecs(bool reverse, int partSize) const {
+	int result = 0;
+	int conStreak = 0;
+
+	int searchFor = 1;
+	if (reverse)
+		searchFor = -1;
+
+	for (int i = 0; i < numTiles - 1; i++) {
+		int j = rowSize * (i % rowSize) + (i / rowSize);
+		if (j + rowSize > numTiles-1) {
+			conStreak = 0;
+			continue;
+		}
+		if (layout[j + rowSize] - layout[j] == searchFor) {
+			conStreak++;
+			if (conStreak >= partSize - 1) {
+				result++;
+			}
+		}
+		else {
+			conStreak = 0;
+		}
+	}
+
+	return result;
+}
