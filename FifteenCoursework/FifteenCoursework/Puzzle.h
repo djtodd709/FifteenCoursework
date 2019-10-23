@@ -1,7 +1,9 @@
+//Code by Dave Todd - b9052651
 #pragma once
 
 #include <iostream>
 #include <random>
+
 using namespace std;
 
 class Puzzle
