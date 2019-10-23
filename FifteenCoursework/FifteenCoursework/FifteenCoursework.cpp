@@ -7,6 +7,8 @@
 #include <sstream>
 #include <algorithm>
 #include <time.h>
+#include <thread>
+#include <mutex>
 #include "Puzzle.h"
 
 using namespace std;
@@ -82,6 +84,9 @@ Puzzle** openFile(int& numPuzzles) {
 		getline(infile, line);
 		int rowSize = count(line.begin(), line.end(), '\t');
 		int squareSize = rowSize * rowSize - 1;
+		if (squareSize < 8) {
+			return NULL;
+		}
 		int* square = new int[squareSize];
 		
 		extractRow(square, line);
@@ -271,6 +276,19 @@ void makeManualPuzzle() {
 
 }
 
+struct threadPack {
+	int rows;
+	int index;
+	Puzzle** randPuzzles;
+	mutex* mm;
+};
+
+void addRandPuzzle(threadPack tp) {
+	Puzzle* p = new RandomPuzzle(tp.rows);
+	lock_guard<mutex>guard(*(tp.mm));
+	tp.randPuzzles[tp.index] = p;
+}
+
 void makeRandomPuzzle() {
 	system("CLS");
 	cout << "Generate Random Configurations" << endl;
@@ -280,15 +298,52 @@ void makeRandomPuzzle() {
 	cout << "How many configurations would you like to generate?: " << endl;
 	int numPuzzles;
 	getInputNum(numPuzzles, 1, INT_MAX);
+	cout << "(1) Yes" << endl;
+	cout << "(2) No" << endl;
+	cout << "Would you like to see the puzzles after generation?: " << endl;
+	int showChoice;
+	getInputNum(showChoice, 1, INT_MAX);
+
+	clock_t timer = clock();
+
 	Puzzle** randPuzzles = new Puzzle*[numPuzzles];
-	for (int i = 0; i < numPuzzles; i++) {
-		Puzzle* p = new RandomPuzzle(psize);
 
-		cout << *p;
-		cout << endl;
+	if (numPuzzles >= 500) {
+		for (int i = 0; i < numPuzzles; i++) {
+			Puzzle* p = new RandomPuzzle(psize);
 
-		randPuzzles[i] = p;
+			if (showChoice == 1)
+				cout << *p << endl;
+
+			randPuzzles[i] = p;
+		}
 	}
+	else {
+
+		thread* t = new thread[numPuzzles];
+		mutex mMutex;
+
+		for (int i = 0; i < numPuzzles; i++) {
+			threadPack tp;
+			tp.index = i;
+			tp.mm = &mMutex;
+			tp.randPuzzles = randPuzzles;
+			tp.rows = psize;
+			t[i] = thread(addRandPuzzle, tp);
+		}
+
+		for (int i = 0; i < numPuzzles; i++) {
+			t[i].join();
+			if (showChoice == 1)
+				cout << *randPuzzles[i] << endl;
+		}
+		
+		delete[] t;
+		t = NULL;
+	}
+
+	double diff = double(clock() - timer) / double(CLOCKS_PER_SEC);
+	cout << "Generation finished in " << diff << " seconds" << endl;
 
 	cout << endl << "(1) Overite 15-File" << endl;
 	cout << "(2) Append to 15-File" << endl;
@@ -311,8 +366,8 @@ void readPuzzles() {
 	Puzzle** pList = openFile(numPuzzles);
 
 	if (pList == NULL) {
-		cout << "You do not currently have a 15-File." << endl;
-		cout << "Please create one using the other menu options first." << endl << endl;
+		cout << "You do not currently have a 15-File, or the file is invalid." << endl;
+		cout << "Please create a valid file using the other menu options first." << endl << endl;
 		return;
 	}
 
@@ -364,7 +419,6 @@ void readPuzzles() {
 
 int main()
 {
-	srand(time(NULL));
 
 	bool exit = false;
 

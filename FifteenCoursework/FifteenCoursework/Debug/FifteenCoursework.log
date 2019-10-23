@@ -1,3 +1,4 @@
 ﻿  FifteenCoursework.cpp
-H:\Visual Studio 2019\Repos\FifteenCoursework\FifteenCoursework\FifteenCoursework\FifteenCoursework.cpp(367,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  Puzzle.cpp
+  Generating Code...
   FifteenCoursework.vcxproj -> H:\Visual Studio 2019\Repos\FifteenCoursework\FifteenCoursework\Debug\FifteenCoursework.exe
