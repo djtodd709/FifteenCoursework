@@ -1,5 +1,5 @@
 // FifteenCoursework.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+// Code by Dave Todd - b9052651
 
 #pragma once
 #include <iostream>

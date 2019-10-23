@@ -1,3 +1,5 @@
+// Code by Dave Todd - b9052651
+
 #include <iostream>
 #include <stdlib.h>
 #include "Puzzle.h"
