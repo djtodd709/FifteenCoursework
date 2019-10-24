@@ -1,6 +1,8 @@
-#include <iostream>
+//Code by Dave Todd - b9052651
+
 #include <stdlib.h>
 #include "Puzzle.h"
+#include <time.h>
 
 using namespace std;
 
@@ -9,7 +11,7 @@ rowSize(rows),setTiles(0),numLimit(20){
 	numTiles = (rows * rows) - 1;
 	layout = new int[numTiles];
 	if (numTiles > 20)
-		numLimit = numTiles;
+		numLimit = numTiles+10;
 }
 
 Puzzle::Puzzle(int* setup, int rows) :
@@ -24,15 +26,26 @@ Puzzle::~Puzzle() {
 	delete[] layout;
 }
 
+random_device r;
+mt19937 gen(r());
+
 RandomPuzzle::RandomPuzzle(int rows):
 Puzzle(rows){
+	uniform_int_distribution<int> distribution(1, numLimit);
+	time_t timer = time(NULL);
+	bool* present = new bool[numLimit] {false};
 	for (int i = 0; i < numTiles; i++) {
-		int x = rand() % numLimit + 1;
-		while (isTilePresent(x)) {
-			x = rand() % numLimit + 1;
+		
+		int x = distribution(gen);
+		while (present[x-1]) {
+			x = distribution(gen);
 		}
 		setNextTile(x);
+		present[x - 1] = true;
 	}
+
+	delete[] present;
+	present = NULL;
 }
 
 bool Puzzle::isTilePresent(int value) const{
@@ -41,6 +54,10 @@ bool Puzzle::isTilePresent(int value) const{
 		present = present | (layout[i] == value);
 	}
 	return present;
+}
+
+int Puzzle::getRowSize() const {
+	return rowSize;
 }
 
 int Puzzle::getNumLimit() const {
@@ -120,4 +137,82 @@ unsigned long long Puzzle::getAnswer(bool includeLastRow) const{
 		answer += getConsCombs(rowSize-1) * fac(numTiles + 1 - rowSize) / 2;
 	}
 	return answer;
+}
+
+int Puzzle::numPossibilities(int partSize) const{
+	if (partSize > rowSize)
+		return 0;
+	int possibilities = rowSize - 1;
+	while (partSize < rowSize) {
+		possibilities += rowSize;
+		partSize++;
+	}
+	return possibilities;
+}
+
+void Puzzle::getAnswerFacForm(int& prefix, int& factorial, int partSize, bool includeLast) const {
+	int spaces = numTiles - partSize;
+
+	prefix = numPossibilities(partSize) * getConsCombs(partSize);
+	factorial = spaces;
+
+	if (includeLast && partSize == rowSize) {
+		int combinations = getConsCombs(partSize-1) * (spaces + 1);
+		prefix += combinations;
+	}
+}
+
+int Puzzle::rowConsecs(bool reverse, int partSize) const {
+	int result = 0;
+	int conStreak = 0;
+
+	int searchFor = 1;
+	if (reverse)
+		searchFor = -1;
+
+	for (int i = 0; i < numTiles - 1; i++) {
+		if ((i + 1) % rowSize == 0) {
+			conStreak = 0;
+			continue;
+		}
+		if (layout[i + 1] - layout[i] == searchFor) {
+			conStreak++;
+			if (conStreak >= partSize - 1) {
+				result++;
+			}
+		}
+		else {
+			conStreak = 0;
+		}
+	}
+
+	return result;
+}
+
+int Puzzle::colConsecs(bool reverse, int partSize) const {
+	int result = 0;
+	int conStreak = 0;
+
+	int searchFor = 1;
+	if (reverse)
+		searchFor = -1;
+
+	for (int i = 0; i < numTiles - 1; i++) {
+		int j = rowSize * (i % rowSize) + (i / rowSize);
+		if (j + rowSize > numTiles-1) {
+			conStreak = 0;
+			continue;
+		}
+		if (layout[j + rowSize] - layout[j] == searchFor) {
+			conStreak++;
+			if (conStreak >= partSize - 1) {
+				result++;
+			}
+		}
+		else {
+			conStreak = 0;
+		}
+	}
+
+	return result;
 }

@@ -1,55 +1,89 @@
-6
-10	17	20	18	
-14	16	6	5	
-9	2	12	3	
-15	1	4	
-row = 1975881600
-column = 1975881600
-reverse row = 1975881600
-reverse column = 1975881600
+4
+21	32	26	25	5	
+12	22	18	24	1	
+15	27	29	10	17	
+4	33	8	20	31	
+34	23	28	3	
+Number of 4-partial continuous rows/columns, for all valid turns
+row = 36 x 20!
+column = 36 x 20!
+reverse row = 36 x 20!
+reverse column = 36 x 20!
+Total for row & column, including reverse, in this configuration
+2 = 2
+3 = 0
+4 = 0
+5 = 0
+Total for row & column, including reverse, for all valid turns
+2 = 570 x 22!
+3 = 308 x 21!
+4 = 144 x 20!
+5 = 48 x 19!
+5(free square included) = 368 x 19!
 
-8	9	7	3	
-16	15	20	17	
-18	4	13	10	
-14	19	5	
-row = 2514758400
-column = 2514758400
-reverse row = 2514758400
-reverse column = 2514758400
+23	3	32	6	10	
+15	8	4	20	18	
+16	30	12	1	34	
+31	14	2	29	25	
+22	5	21	9	
+Number of 4-partial continuous rows/columns, for all valid turns
+row = 22.5 x 20!
+column = 22.5 x 20!
+reverse row = 22.5 x 20!
+reverse column = 22.5 x 20!
+Total for row & column, including reverse, in this configuration
+2 = 1
+3 = 0
+4 = 0
+5 = 0
+Total for row & column, including reverse, for all valid turns
+2 = 570 x 22!
+3 = 280 x 21!
+4 = 90 x 20!
+5 = 16 x 19!
+5(free square included) = 216 x 19!
 
-8	10	7	20	
-18	15	1	16	
-17	3	13	9	
-14	6	11	
-row = 2275257600
-column = 2275257600
-reverse row = 2275257600
-reverse column = 2275257600
+33	25	4	27	31	
+15	7	1	16	6	
+3	30	5	26	23	
+12	9	22	10	28	
+20	34	21	2	
+Number of 4-partial continuous rows/columns, for all valid turns
+row = 27 x 20!
+column = 27 x 20!
+reverse row = 27 x 20!
+reverse column = 27 x 20!
+Total for row & column, including reverse, in this configuration
+2 = 1
+3 = 0
+4 = 0
+5 = 0
+Total for row & column, including reverse, for all valid turns
+2 = 608 x 22!
+3 = 252 x 21!
+4 = 108 x 20!
+5 = 24 x 19!
+5(free square included) = 264 x 19!
 
-14	18	6	20	
-11	17	10	3	
-4	5	2	16	
-9	13	15	
-row = 2215382400
-column = 2215382400
-reverse row = 2215382400
-reverse column = 2215382400
-
-2	19	7	20	
-4	12	10	18	
-1	15	14	17	
-13	6	8	
-row = 1317254400
-column = 1317254400
-reverse row = 1317254400
-reverse column = 1317254400
-
-8	16	20	6	
-4	11	10	13	
-19	17	7	3	
-5	14	18	
-row = 1975881600
-column = 1975881600
-reverse row = 1975881600
-reverse column = 1975881600
+13	23	27	22	29	
+14	10	32	18	1	
+28	16	25	15	20	
+3	26	2	30	7	
+19	21	34	24	
+Number of 4-partial continuous rows/columns, for all valid turns
+row = 49.5 x 20!
+column = 49.5 x 20!
+reverse row = 49.5 x 20!
+reverse column = 49.5 x 20!
+Total for row & column, including reverse, in this configuration
+2 = 1
+3 = 0
+4 = 0
+5 = 0
+Total for row & column, including reverse, for all valid turns
+2 = 646 x 22!
+3 = 392 x 21!
+4 = 198 x 20!
+5 = 72 x 19!
+5(free square included) = 512 x 19!
 

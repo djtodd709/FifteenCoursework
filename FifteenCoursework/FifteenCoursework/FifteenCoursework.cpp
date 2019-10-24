@@ -1,12 +1,14 @@
 // FifteenCoursework.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+// Code by Dave Todd - b9052651
 
 #pragma once
-#include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <algorithm>
 #include <time.h>
+#include <thread>
+#include <mutex>
 #include "Puzzle.h"
 
 using namespace std;
@@ -56,7 +58,16 @@ void fillPuzzle(Puzzle*& p) {
 	p->setNextTile(x);
 }
 
-Puzzle** openFile(int& numPuzzles, int rowSize) {
+void extractRow(int* const & row, string line) {
+	stringstream ss(line);
+	int index = 0;
+	for (int i = 0; ss >> i;) {
+		row[index] = i;
+		index++;
+	}
+}
+
+Puzzle** openFile(int& numPuzzles) {
 	string line;
 	ifstream infile("15-File.txt");
 	if (!infile) {
@@ -64,37 +75,90 @@ Puzzle** openFile(int& numPuzzles, int rowSize) {
 		return NULL;
 	}
 
-	infile >> line;
+	getline(infile, line);
 	numPuzzles = stoi(line);
 
 	Puzzle** puzzleList = new Puzzle * [numPuzzles];
 
-	int squareSize = rowSize * rowSize - 1;
-	int i = 0;
-	int listIndex = 0;
-	int* square = new int[squareSize];
-	while (infile >> line) {
-		square[i] = stoi(line);
-		i++;
-		if (i == squareSize) {
-			i = 0;
-			Puzzle* p = new Puzzle(square, rowSize);
-			puzzleList[listIndex] = p;
-			listIndex++;
+	for (int i = 0; i < numPuzzles; i++) {
+		getline(infile, line);
+		int rowSize = count(line.begin(), line.end(), '\t');
+		int squareSize = rowSize * rowSize - 1;
+		if (squareSize < 8) {
+			return NULL;
 		}
-	}
+		int* square = new int[squareSize];
+		
+		extractRow(square, line);
 
-	if (listIndex != numPuzzles) {
-		infile.close();
-		cout << "Unexpected number of puzzles. 15-file is corrupt. Try creating a new 15-file." << endl;
-		return NULL;
+		for (int j = 1; j < rowSize; j++) {
+			getline(infile, line);
+			extractRow(square+(j*rowSize), line);
+		}
+
+		Puzzle* p = new Puzzle(square, rowSize);
+		puzzleList[i] = p;
+		getline(infile, line);
 	}
 
 	infile.close();
 	return puzzleList;
 }
 
-void saveSolution() {
+void outputAnalysis(ostream& dest, Puzzle** pList, int numPuzzles, int partialSize, bool freeSquare) {
+	dest << numPuzzles << endl;
+
+	for (int i = 0; i < numPuzzles; i++) {
+		Puzzle* p = pList[i];
+		dest << *p;
+
+		int prefix;
+		int suffix;
+		p->getAnswerFacForm(prefix, suffix, partialSize, freeSquare);
+		
+		dest << "Number of " << partialSize << "-partial continuous rows/columns, for all valid turns" << endl;
+		if (prefix > 0) {
+			if (prefix % 2 == 1) {
+				dest << "row = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
+				dest << "column = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
+				dest << "reverse row = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
+				dest << "reverse column = " << prefix / 2 << ".5 x " << suffix << "!" << endl;
+			}
+			else {
+				dest << "row = " << prefix / 2 << " x " << suffix << "!" << endl;
+				dest << "column = " << prefix / 2 << " x " << suffix << "!" << endl;
+				dest << "reverse row = " << prefix / 2 << " x " << suffix << "!" << endl;
+				dest << "reverse column = " << prefix / 2 << " x " << suffix << "!" << endl;
+			}
+		}
+		else {
+			dest << "row = 0" << endl;
+			dest << "column = 0" << endl;
+			dest << "reverse row = 0" << endl;
+			dest << "reverse column = 0" << endl;
+		}
+
+		dest << "Total for row & column, including reverse, in this configuration" << endl;
+		for (int j = 2; j <= p->getRowSize(); j++) {
+			dest << j << " = " << p->rowConsecs(false, j) + p->colConsecs(false, j) + p->rowConsecs(true, j) + p->colConsecs(true, j) << endl;
+		}
+
+		dest << "Total for row & column, including reverse, for all valid turns" << endl;
+		for (int j = 2; j <= p->getRowSize(); j++) {
+			p->getAnswerFacForm(prefix, suffix, j, false);
+			dest << j << " = " << prefix * 2 << " x " << suffix << "!" << endl;
+		}
+		p->getAnswerFacForm(prefix, suffix, p->getRowSize(), true);
+		dest << p->getRowSize() << "(free square included) = " << prefix * 2 << " x " << suffix << "!" << endl;
+
+		dest << endl;
+
+		delete p;
+		p = NULL;
+	}
+}
+
+void saveSolution(int partialSize, bool freeSquare) {
 	ofstream outfile("Solution-File.txt");
 	if (!outfile) {
 		cout << "Could not open the solution-file." << endl;
@@ -102,21 +166,9 @@ void saveSolution() {
 	}
 
 	int numPuzzles;
-	Puzzle** pList = openFile(numPuzzles, 4);
+	Puzzle** pList = openFile(numPuzzles);
 
-	outfile << numPuzzles << endl;
-
-	for (int i = 0; i < numPuzzles; i++) {
-		Puzzle* p = pList[i];
-		outfile << *p;
-		unsigned long long continuousAns = p->getAnswer(true);
-		outfile << "row = " << continuousAns << endl;
-		outfile << "column = " << continuousAns << endl;
-		outfile << "reverse row = " << continuousAns << endl;
-		outfile << "reverse column = " << continuousAns << endl << endl;
-		delete p;
-		p = NULL;
-	}
+	outputAnalysis(outfile, pList, numPuzzles, partialSize, freeSquare);
 
 	delete[] pList;
 	pList = NULL;
@@ -142,7 +194,7 @@ void overwriteFile(Puzzle** puzzleList, int numPuzzles) {
 
 void appendFile(Puzzle** puzzleList, int numPuzzles) {
 	int oldNumPuzzles;
-	Puzzle** oldPuzzleList = openFile(oldNumPuzzles, 4);
+	Puzzle** oldPuzzleList = openFile(oldNumPuzzles);
 
 	if (oldPuzzleList == NULL) {
 		cout << "Could not find the 15-file. Creating new 15-File..." << endl;
@@ -200,7 +252,10 @@ void fileChoice(Puzzle** puzzleList, int numPuzzles) {
 }
 
 void makeManualPuzzle() {
-	Puzzle* p = new Puzzle(4);
+	cout << "How many rows/columns will your puzzle have?: ";
+	int psize = 4;
+	getInputNum(psize, 3, INT_MAX);
+	Puzzle* p = new Puzzle(psize);
 
 	while (!p->isFull()) {
 		fillPuzzle(p);
@@ -221,21 +276,74 @@ void makeManualPuzzle() {
 
 }
 
+struct threadPack {
+	int rows;
+	int index;
+	Puzzle** randPuzzles;
+	mutex* mm;
+};
+
+void addRandPuzzle(threadPack tp) {
+	Puzzle* p = new RandomPuzzle(tp.rows);
+	lock_guard<mutex>guard(*(tp.mm));
+	tp.randPuzzles[tp.index] = p;
+}
+
 void makeRandomPuzzle() {
 	system("CLS");
 	cout << "Generate Random Configurations" << endl;
+	cout << "How many rows/columns will your puzzles have?: ";
+	int psize = 4;
+	getInputNum(psize, 3, INT_MAX);
 	cout << "How many configurations would you like to generate?: " << endl;
 	int numPuzzles;
 	getInputNum(numPuzzles, 1, INT_MAX);
+	cout << "(1) Yes" << endl;
+	cout << "(2) No" << endl;
+	cout << "Would you like to see the puzzles after generation?: " << endl;
+	int showChoice;
+	getInputNum(showChoice, 1, INT_MAX);
+
+	clock_t timer = clock();
+
 	Puzzle** randPuzzles = new Puzzle*[numPuzzles];
-	for (int i = 0; i < numPuzzles; i++) {
-		Puzzle* p = new RandomPuzzle(4);
 
-		cout << *p;
-		cout << endl;
+	if (psize <= 500) {
+		for (int i = 0; i < numPuzzles; i++) {
+			Puzzle* p = new RandomPuzzle(psize);
 
-		randPuzzles[i] = p;
+			if (showChoice == 1)
+				cout << *p << endl;
+
+			randPuzzles[i] = p;
+		}
 	}
+	else {
+
+		thread* t = new thread[numPuzzles];
+		mutex mMutex;
+
+		for (int i = 0; i < numPuzzles; i++) {
+			threadPack tp;
+			tp.index = i;
+			tp.mm = &mMutex;
+			tp.randPuzzles = randPuzzles;
+			tp.rows = psize;
+			t[i] = thread(addRandPuzzle, tp);
+		}
+
+		for (int i = 0; i < numPuzzles; i++) {
+			t[i].join();
+			if (showChoice == 1)
+				cout << *randPuzzles[i] << endl;
+		}
+		
+		delete[] t;
+		t = NULL;
+	}
+
+	double diff = double(clock() - timer) / double(CLOCKS_PER_SEC);
+	cout << "Generation finished in " << diff << " seconds" << endl;
 
 	cout << endl << "(1) Overite 15-File" << endl;
 	cout << "(2) Append to 15-File" << endl;
@@ -255,19 +363,23 @@ void readPuzzles() {
 	system("CLS");
 
 	int numPuzzles;
-	Puzzle** pList = openFile(numPuzzles, 4);
+	Puzzle** pList = openFile(numPuzzles);
 
 	if (pList == NULL) {
-		cout << "You do not currently have a 15-File." << endl;
-		cout << "Please create one using the other menu options first." << endl << endl;
+		cout << "You do not currently have a 15-File, or the file is invalid." << endl;
+		cout << "Please create a valid file using the other menu options first." << endl << endl;
 		return;
 	}
 
 	bool freeSquare = true;
 
+	cout << "What partial size would you like to use?: ";
+	int partialSize;
+	getInputNum(partialSize, 2, INT_MAX);
+
 	cout << "(1)\tInclude rows/columns with the free square" << endl;
 	cout << "(2)\tIgnore rows/columns with the free square" << endl;
-	cout << "What would you like to do?: ";
+	cout << "What would you like to do in the case of " << partialSize << "x" << partialSize <<" puzzles?: ";
 	int x;
 	getInputNum(x, 1, 2);
 
@@ -282,19 +394,7 @@ void readPuzzles() {
 
 	cout << "Your current 15-File:" << endl;
 
-	cout << numPuzzles << endl;
-
-	for (int i = 0; i < numPuzzles; i++) {
-		Puzzle* p = pList[i];
-		cout << *p;
-		unsigned long long continuousAns = p->getAnswer(freeSquare);
-		cout << "row = " << continuousAns << endl;
-		cout << "column = " << continuousAns << endl;
-		cout << "reverse row = " << continuousAns << endl;
-		cout << "reverse column = " << continuousAns << endl << endl;
-		delete p;
-		p = NULL;
-	}
+	outputAnalysis(cout, pList, numPuzzles, partialSize, freeSquare);
 
 	delete[] pList;
 	pList = NULL;
@@ -307,7 +407,7 @@ void readPuzzles() {
 
 	switch (y) {
 	case 1:
-		saveSolution();
+		saveSolution(partialSize,freeSquare);
 		system("CLS");
 		cout << "Solution file saved succesfully" << endl;
 		break;
@@ -319,7 +419,6 @@ void readPuzzles() {
 
 int main()
 {
-	srand(time(NULL));
 
 	bool exit = false;
 
@@ -351,31 +450,4 @@ int main()
 			break;
 	}
 
-	
-
-	
-
-	//int start[15] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
-
-	
-
-
-
-
-	/*int start3[8] = { 1,2,3,4,5,6,7,8 };
-	int start5[24] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24 };
-	printPuzzle(start,4);
-	int consecs = consecutivePerms(start, 4);
-	cout << consecs << endl;
-	int ans = answer(consecs, 4);
-	
-	printPuzzle(start5, 5);
-	int consecs = consecutivePerms(start5, 5);
-	cout << consecs << endl;
-	unsigned long long ans = answerL(consecs, 5);
-
-	cout << "row\t\t = " << ans << endl;
-	cout << "column\t\t = " << ans << endl;
-	cout << "reverse row\t = " << ans << endl;
-	cout << "reverse column\t = " << ans << endl;*/
 }
