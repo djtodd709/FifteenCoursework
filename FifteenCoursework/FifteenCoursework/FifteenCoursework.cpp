@@ -308,7 +308,7 @@ void makeRandomPuzzle() {
 
 	Puzzle** randPuzzles = new Puzzle*[numPuzzles];
 
-	if (numPuzzles >= 500) {
+	if (psize <= 500) {
 		for (int i = 0; i < numPuzzles; i++) {
 			Puzzle* p = new RandomPuzzle(psize);
 
